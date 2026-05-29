@@ -1,5 +1,42 @@
 # AOB Discovery Log — FIFA 17 Youth Academy Port
 
+## Session 3: Minimum Promotion Age
+
+### Scope
+
+Implemented issue `13-youth-academy-min-promotion-age.md` up to the required real Career Mode validation pass.
+
+### Results
+
+- FIFA 19 AOB `41 B8 03 00 00 00 89 85 E4` was scanned against `FIFA17.exe` and returned 0 matches.
+- Reengineered the slice through FIFA 17's INI setting lookup path instead of the FIFA 19 hardcoded age-category write.
+- Confirmed unique FIFA 17 AOB `49 8B 41 18 48 8B 04 C8 48 85 C0 74 0E` at `0x147765D31`.
+- Added `AOB_MinAgeForPromotionIniLookup` to `lua/youth_helpers.lua`.
+- Added `MIN_PLAYER_AGE_FOR_PROMOTION = 12` under the `Youth Academy` CT group.
+- `auto_assemble_check(script)` passed for the enable section.
+- Confirmed `FIFA_17_Cheat_Table.CT` remains well-formed XML.
+
+### Original Code Context
+
+```asm
+147765D31 - 49 8B 41 18  - mov rax,[r9+18]
+147765D35 - 48 8B 04 C8  - mov rax,[rax+rcx*8]
+147765D39 - 48 85 C0     - test rax,rax
+147765D3C - 74 0E        - je 147765D4C
+147765D3E - 44 3B 00     - cmp r8d,[rax]
+147765D41 - 74 0C        - je 147765D4F
+147765D43 - 48 8B 40 10  - mov rax,[rax+10]
+147765D47 - 48 85 C0     - test rax,rax
+147765D4A - 75 F2        - jne 147765D3E
+147765D4C - 31 C0        - xor eax,eax
+147765D4E - C3           - ret
+147765D4F - 48 8B 40 08  - mov rax,[rax+08]
+```
+
+### Validation Notes
+
+The hook preserves the first two original lookup instructions, compares the current lookup string against `YOUTH_SQUAD/MIN_PLAYER_AGE_FOR_PROMOTION`, and writes `12` to the resolved setting value at `[value+08]`. Disable restores the original 8 bytes at the injection point. Real in-game validation is still required with a FIFA 17 Career Mode save containing a youth academy player below the normal promotion age.
+
 ## Session 2: Shared Scaffolding
 
 ### Scope

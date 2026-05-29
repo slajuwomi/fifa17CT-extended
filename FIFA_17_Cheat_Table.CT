@@ -2484,6 +2484,77 @@ dealloc(newmem_GtnReveal)
           <LastState Value="" RealAddress="00000000"/>
           <Color>004080</Color>
           <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+          <ID>9021</ID>
+          <Description>"MIN_PLAYER_AGE_FOR_PROMOTION = 12"</Description>
+          <LastState/>
+          <Color>004080</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if get_validated_address == nil then
+  error('Youth Academy helpers are not loaded. Enable ActivateItFirst first.')
+end
+get_validated_address('AOB_MinAgeForPromotionIniLookup')
+{$asm}
+aobscanmodule(INJECT_YA_MinPromotionAge,FIFA17.exe,49 8B 41 18 48 8B 04 C8 48 85 C0 74 0E)
+alloc(newmem_YA_MinPromotionAge,$1000,INJECT_YA_MinPromotionAge)
+label(return_YA_MinPromotionAge)
+label(done_YA_MinPromotionAge)
+label(skip_YA_MinPromotionAge)
+label(str_YA_MinPromotionAge)
+
+newmem_YA_MinPromotionAge:
+  mov rax,[r9+18]
+  mov rax,[rax+rcx*8]
+  test rax,rax
+  je done_YA_MinPromotionAge
+
+  pushfq
+  push rsi
+  push rdi
+  push rcx
+  push rbx
+
+  mov rbx,[rax+08]
+  mov rsi,str_YA_MinPromotionAge
+  mov rdi,rdx
+  sub rdi,#41
+  mov rcx,#40
+  repe cmpsb
+  jne skip_YA_MinPromotionAge
+
+  mov [rbx+08],(int)12
+
+skip_YA_MinPromotionAge:
+  pop rbx
+  pop rcx
+  pop rdi
+  pop rsi
+  popfq
+
+done_YA_MinPromotionAge:
+  jmp return_YA_MinPromotionAge
+
+str_YA_MinPromotionAge:
+  db 'YOUTH_SQUAD/MIN_PLAYER_AGE_FOR_PROMOTION',0
+
+INJECT_YA_MinPromotionAge:
+  jmp newmem_YA_MinPromotionAge
+  nop 3
+return_YA_MinPromotionAge:
+registersymbol(INJECT_YA_MinPromotionAge)
+
+[DISABLE]
+INJECT_YA_MinPromotionAge:
+  db 49 8B 41 18 48 8B 04 C8
+
+unregistersymbol(INJECT_YA_MinPromotionAge)
+dealloc(newmem_YA_MinPromotionAge)</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
         <CheatEntry>
           <ID>1</ID>

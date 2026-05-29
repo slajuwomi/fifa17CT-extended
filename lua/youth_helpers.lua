@@ -12,6 +12,16 @@ YouthAcademyHelpers.cachedAddresses = cachedAddresses
 YouthAcademyHelpers.originalBytes = originalBytes
 YouthAcademyHelpers.loaded = true
 
+local function get_scan_result_address(results, index)
+  if results.getAddress then
+    return results.getAddress(index)
+  end
+  if results.getString then
+    return results.getString(index)
+  end
+  return results[index]
+end
+
 local function scan_unique(pattern)
   local results = AOBScan(pattern)
   if results == nil then
@@ -21,7 +31,7 @@ local function scan_unique(pattern)
   local count = results.getCount()
   local address = nil
   if count == 1 then
-    address = results.getAddress(0)
+    address = get_scan_result_address(results, 0)
   end
 
   results.destroy()
@@ -39,6 +49,11 @@ function register_youth_aob(key, pattern)
   aobs[key] = pattern
   cachedAddresses[key] = nil
 end
+
+register_youth_aob(
+  'AOB_MinAgeForPromotionIniLookup',
+  '49 8B 41 18 48 8B 04 C8 48 85 C0 74 0E'
+)
 
 function get_validated_address(key)
   if cachedAddresses[key] then
