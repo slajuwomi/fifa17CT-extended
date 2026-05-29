@@ -32,7 +32,10 @@ and reviewed independently.
    discovery output, and real FIFA 17 Career Mode validation where required.
 6. Update `docs/aob-discovery-log.md` for every feature slice before considering the
    issue complete.
-7. Do not start the next issue until the current issue's acceptance criteria are either
+7. Add a concise handoff summary for the feature slice under `docs/summary/` before
+   finishing the pass. Name it after the issue, for example
+   `docs/summary/13-youth-academy-min-promotion-age-summary.md`.
+8. Do not start the next issue until the current issue's acceptance criteria are either
    complete or explicitly blocked with evidence.
 
 ## TDD Guidance for This Repo
@@ -59,6 +62,7 @@ An issue is complete only when:
 - Every acceptance criterion in the issue is checked off or explicitly marked blocked.
 - The PRD remains consistent with the implementation.
 - Relevant discovery notes have been added to `docs/aob-discovery-log.md`.
+- A feature-slice handoff summary has been added under `docs/summary/`.
 - The modified CT still loads or the blocker explains why it cannot be validated yet.
 - No unrelated features were implemented.
 
@@ -114,6 +118,23 @@ final validation summary.
 - Do not preserve compatibility with speculative or unshipped Youth Academy work if a
   cleaner implementation is available within the current issue.
 
+## Required Summary File Per Issue
+
+Create `docs/summary/<issue-file-stem>-summary.md` during each feature pass. Keep it
+brief but useful for the next agent. Include:
+
+- What changed.
+- What was discovered, including confirmed AOBs, rejected AOBs, injection addresses, and
+  alternate approaches.
+- What validation passed and what remains blocked.
+- What worked well.
+- What did not work or caused errors.
+- Notes and cautions for future agents.
+- Remaining risks for cross-feature validation.
+
+If an issue is blocked, still create or update the summary file and clearly mark the
+blocked validation step, evidence gathered, and next decision needed.
+
 ## Expected Final Report Per Issue
 
 When finishing a development pass, report:
@@ -122,4 +143,5 @@ When finishing a development pass, report:
 - What behavior was validated.
 - Which files changed.
 - Whether the issue file was moved to `docs/issues/done/`.
+- Which summary file was created or updated.
 - Any remaining risk or manual validation still needed.
