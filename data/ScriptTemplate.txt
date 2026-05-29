@@ -1,10 +1,22 @@
 [ENABLE]
-aobscanmodule(INJECT_iniConverter,FIFA17.exe,05 8B 58 08 EB 02) // should be unique
-alloc(cave_iniConverter,$220000,"FIFA17.exe"+77666D5)
+aobscanmodule(INJECT_iniConverter,FIFA17.exe,49 8B 41 18 48 8B 04 C8 48 85 C0 74 0E) // should be unique
+alloc(cave_iniConverter,$350000,"FIFA17.exe"+7768381)
 
 label(code_iniConverter)
 label(ret_iniConverter)
 label(exit)
+
+// Scratch space for the pointer read from the game (see mov [ptrVal], rsi in injected code).
+// Without alloc(), Cheat Engine has no address for [ptrVal] and those instructions fail to assemble.
+alloc(ptrVal, 8)
+ptrVal:
+dq 00
+
+// 64-bit slot to copy rdx and adjust it for string compare (mov [saveRDX], rdx / sub [saveRDX], rcx).
+// The generator emits [saveRDX] for every INI section name; this memory must exist or mov [saveRDX], rdx cannot compile.
+alloc(saveRDX, 8)
+saveRDX:
+dq 00
 
 
 cave_iniConverter:
@@ -12,11 +24,17 @@ PUSHF
 PUSH RSI
 PUSH RDI
 PUSH RCX
+// Re-run the original instructions that the injection jump replaces, then save the INI value pointer.
+mov rax,[r9+18]
+mov rax,[rax+rcx*8]
+test rax, rax
+je exit
+mov rsi, [rax+08]
+mov [ptrVal], rsi
 jmp code_iniConverter
 
 
 code_iniConverter:
-  mov ebx,[rax+08]
   jmp exit
 
 
@@ -25,17 +43,27 @@ exit:
   POP RDI
   POP RSI
   POPF
-  jmp INJECT_iniConverter+08
+  jmp ret_iniConverter
 
-INJECT_iniConverter+01:
+INJECT_iniConverter:
   jmp cave_iniConverter
+  nop
+  nop
+  nop
 ret_iniConverter:
 registersymbol(INJECT_iniConverter)
+registersymbol(ptrVal)
+registersymbol(saveRDX)
 
 [DISABLE]
 //code_iniConverter from here till the end of the code_iniConverter will be used to disable the cheat
-INJECT_iniConverter+01:
-  db 8B 58 08 EB 02
+INJECT_iniConverter:
+  db 49 8B 41 18 48 8B 04 C8
 
 unregistersymbol(INJECT_iniConverter)
+unregistersymbol(saveRDX)
+unregistersymbol(ptrVal)
+// Free in reverse order of allocation so the cave and symbols are torn down cleanly.
+dealloc(saveRDX)
+dealloc(ptrVal)
 dealloc(cave_iniConverter)

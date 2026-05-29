@@ -215,27 +215,31 @@ Func CreateScript()
 
 	Dim $arrTemplate
 	_FileReadToArray($fScriptTemplate, $arrTemplate, 0)
+	; These insertion points match data\ScriptTemplate.txt:
+	; code blocks go before code_iniConverter's default "jmp exit", while value handlers and strings go before the exit label.
+	Local $codeInsertIndex = 37
+	Local $dataInsertIndex = 40
 	For $i = 0 To UBound($arrSections) - 1
-		_ArrayInsert($arrTemplate, 33, "str" & $i & ":") ; Create label for string to be compared
-		_ArrayInsert($arrTemplate, 34, "  db " & "'" & $arrSections[$i] & "', 0") ; Our string
+		_ArrayInsert($arrTemplate, $dataInsertIndex, "str" & $i & ":") ; Create label for string to be compared
+		_ArrayInsert($arrTemplate, $dataInsertIndex + 1, "  db " & "'" & $arrSections[$i] & "', 0") ; Our string
 	Next
 
 	For $i = 0 To UBound($arrSections) - 1
-		_ArrayInsert($arrTemplate, 32, "label_str" & $i & ":") ;
-		_ArrayInsert($arrTemplate, 33, "  mov rsi, [ptrVal]") ;
-		_ArrayInsert($arrTemplate, 34, "  mov [rsi+08]," & IntOrFloat($arrValues[$i])) ; Here we mov our changed value into [rax+08]
-		_ArrayInsert($arrTemplate, 35, "  jmp exit") ;
+		_ArrayInsert($arrTemplate, $dataInsertIndex, "label_str" & $i & ":") ;
+		_ArrayInsert($arrTemplate, $dataInsertIndex + 1, "  mov rsi, [ptrVal]") ;
+		_ArrayInsert($arrTemplate, $dataInsertIndex + 2, "  mov [rsi+08]," & IntOrFloat($arrValues[$i])) ; Here we mov our changed value into [rax+08]
+		_ArrayInsert($arrTemplate, $dataInsertIndex + 3, "  jmp exit") ;
 	Next
 
 	For $i = 0 To UBound($arrSections) - 1
-		_ArrayInsert($arrTemplate, 30, "  mov [saveRDX], rdx")
-		_ArrayInsert($arrTemplate, 31, "  mov rcx, #" & StringLen($arrSections[$i]))
-		_ArrayInsert($arrTemplate, 32, "  sub [saveRDX], rcx")
-		_ArrayInsert($arrTemplate, 33, "  sub [saveRDX], 01")
-		_ArrayInsert($arrTemplate, 34, "  mov rsi, str" & $i)
-		_ArrayInsert($arrTemplate, 35, "  mov rdi, [saveRDX]")
-		_ArrayInsert($arrTemplate, 36, "  rep cmpsb")
-		_ArrayInsert($arrTemplate, 37, "  je label_str" & $i)
+		_ArrayInsert($arrTemplate, $codeInsertIndex, "  mov [saveRDX], rdx")
+		_ArrayInsert($arrTemplate, $codeInsertIndex + 1, "  mov rcx, #" & StringLen($arrSections[$i]))
+		_ArrayInsert($arrTemplate, $codeInsertIndex + 2, "  sub [saveRDX], rcx")
+		_ArrayInsert($arrTemplate, $codeInsertIndex + 3, "  sub [saveRDX], 01")
+		_ArrayInsert($arrTemplate, $codeInsertIndex + 4, "  mov rsi, str" & $i)
+		_ArrayInsert($arrTemplate, $codeInsertIndex + 5, "  mov rdi, [saveRDX]")
+		_ArrayInsert($arrTemplate, $codeInsertIndex + 6, "  rep cmpsb")
+		_ArrayInsert($arrTemplate, $codeInsertIndex + 7, "  je label_str" & $i)
 	Next
 
 	For $i = 0 To UBound($arrSections) - 1
