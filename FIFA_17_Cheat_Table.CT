@@ -7,7 +7,48 @@
       <Options moHideChildren="1"/>
       <LastState Activated="1"/>
       <VariableType>Auto Assembler Script</VariableType>
-      <AssemblerScript>[ENABLE]
+      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+local helperPaths = {
+  'lua/youth_helpers.lua',
+}
+
+if getCheatEngineDir ~= nil then
+  helperPaths[#helperPaths + 1] = getCheatEngineDir() .. 'lua/youth_helpers.lua'
+end
+
+local loadedYouthHelpers = false
+local loadError = nil
+
+for _, helperPath in ipairs(helperPaths) do
+  local file = io.open(helperPath, 'r')
+  if file then
+    local code = file:read('*a')
+    file:close()
+
+    local chunk, err = load(code, '@' .. helperPath)
+    if chunk == nil then
+      loadError = err
+      break
+    end
+
+    local ok, runtimeErr = pcall(chunk)
+    if ok then
+      loadedYouthHelpers = true
+      break
+    end
+
+    loadError = runtimeErr
+    break
+  end
+end
+
+if not loadedYouthHelpers then
+  error('Unable to load lua/youth_helpers.lua' .. (loadError and (': ' .. tostring(loadError)) or ''))
+end
+{$asm}
+[ENABLE]
 //code from here to '[DISABLE]' will be used to enable the cheat
 aobscanmodule(INJECT_ptrTransferBudgetCave,FIFA17.exe,44 8B 48 08 41 89 F8 48 8D 55 A7)
 alloc(ptrTransferBudgetCave,$1000, "FIFA17.exe"+851EFAC)
@@ -2427,6 +2468,14 @@ dealloc(newmem_GtnReveal)
 </AssemblerScript>
             </CheatEntry>
           </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9020</ID>
+          <Description>"Youth Academy"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>004080</Color>
+          <GroupHeader>1</GroupHeader>
         </CheatEntry>
         <CheatEntry>
           <ID>1</ID>
