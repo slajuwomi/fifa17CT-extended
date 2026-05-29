@@ -1,5 +1,48 @@
 # AOB Discovery Log — FIFA 17 Youth Academy Port
 
+## Session 4: 95 Potential
+
+### Scope
+
+Implemented issue `16-youth-academy-95-potential.md` up to the required real Career Mode validation pass.
+
+### Results
+
+- Attached Cheat Engine to `FIFA17.exe` PID 17932.
+- FIFA 19 AOB `89 06 48 8D 76 04 83 FF 02 ?? ?? 4C 8B 7C 24 48` returned 0 matches in `FIFA17.exe`.
+- Found the FIFA 17 format string `PLAYER_ATTRIBUTES/TIER_%d_POTENTIAL_RANGE_%d` at `0x143C626D0`.
+- Found its code reference at `0x148579C6B`.
+- Confirmed unique FIFA 17 AOB `FF C3 48 83 C6 04 89 46 FC 83 FB 02 7C C2 44 89 F3` at `0x148579C97`.
+- Added `AOB_PlayerPotentialRange` to `lua/youth_helpers.lua`.
+- Added `95 Potential` under the `Youth Academy` CT group.
+- `auto_assemble_check(script)` passed for the enable section.
+- Standalone disable-section checking returned a Cheat Engine access violation at `dealloc(newmem_YA_PlayerPotential)` because the allocation does not exist during isolated disable validation; live disable/re-enable remains a HITL validation item.
+
+### Original Code Context
+
+```asm
+148579C67 - 45 8D 4D 01        - lea r9d,[r13+01]
+148579C6B - 4C 8D 05 5E8A6EFB  - lea r8,[143C626D0] ; PLAYER_ATTRIBUTES/TIER_%d_POTENTIAL_RANGE_%d
+148579C72 - 48 8D 4D 90        - lea rcx,[rbp-70]
+148579C76 - BA 64000000        - mov edx,00000064
+148579C7B - 89 5C 24 20        - mov [rsp+20],ebx
+148579C7F - E8 ECB08AFD        - call 145E24D70
+148579C84 - 48 8D 55 90        - lea rdx,[rbp-70]
+148579C88 - 41 B1 01           - mov r9b,01
+148579C8B - 41 83 C8 FF        - or r8d,-01
+148579C8F - 48 89 F9           - mov rcx,rdi
+148579C92 - E8 29A21EFF        - call 147763EC0
+148579C97 - FF C3              - inc ebx
+148579C99 - 48 83 C6 04        - add rsi,04
+148579C9D - 89 46 FC           - mov [rsi-04],eax
+148579CA0 - 83 FB 02           - cmp ebx,02
+148579CA3 - 7C C2              - jl 148579C67
+```
+
+### Validation Notes
+
+The hook replaces `inc ebx; add rsi,04; mov [rsi-04],eax` with the same instructions plus `mov eax,#95` before the write. This forces both potential range values for each tier to 95 as FIFA 17 initializes the loaded player-attribute settings. Real Career Mode validation is still pending: enable `95 Potential` before generating a fresh scout report, confirm generated youth players have 95 potential with other youth generation modifiers disabled, then disable and re-enable without reloading the CT.
+
 ## Session 3: Minimum Promotion Age
 
 ### Scope

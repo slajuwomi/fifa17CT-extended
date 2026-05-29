@@ -2554,6 +2554,44 @@ INJECT_YA_MinPromotionAge:
 unregistersymbol(INJECT_YA_MinPromotionAge)
 dealloc(newmem_YA_MinPromotionAge)</AssemblerScript>
             </CheatEntry>
+            <CheatEntry>
+              <ID>9022</ID>
+              <Description>"95 Potential"</Description>
+              <LastState/>
+              <Color>004080</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if get_validated_address == nil then
+  error('Youth Academy helpers are not loaded. Enable ActivateItFirst first.')
+end
+get_validated_address('AOB_PlayerPotentialRange')
+{$asm}
+aobscanmodule(INJECT_YA_PlayerPotential,FIFA17.exe,FF C3 48 83 C6 04 89 46 FC 83 FB 02 7C C2 44 89 F3)
+alloc(newmem_YA_PlayerPotential,$1000,INJECT_YA_PlayerPotential)
+label(return_YA_PlayerPotential)
+
+newmem_YA_PlayerPotential:
+  inc ebx
+  add rsi,04
+  mov eax,#95
+  mov [rsi-04],eax
+  jmp return_YA_PlayerPotential
+
+INJECT_YA_PlayerPotential:
+  jmp newmem_YA_PlayerPotential
+  nop 4
+return_YA_PlayerPotential:
+registersymbol(INJECT_YA_PlayerPotential)
+
+[DISABLE]
+INJECT_YA_PlayerPotential:
+  db FF C3 48 83 C6 04 89 46 FC
+
+unregistersymbol(INJECT_YA_PlayerPotential)
+dealloc(newmem_YA_PlayerPotential)</AssemblerScript>
+            </CheatEntry>
           </CheatEntries>
         </CheatEntry>
         <CheatEntry>

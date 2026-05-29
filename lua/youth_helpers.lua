@@ -55,6 +55,11 @@ register_youth_aob(
   '49 8B 41 18 48 8B 04 C8 48 85 C0 74 0E'
 )
 
+register_youth_aob(
+  'AOB_PlayerPotentialRange',
+  'FF C3 48 83 C6 04 89 46 FC 83 FB 02 7C C2 44 89 F3'
+)
+
 function get_validated_address(key)
   if cachedAddresses[key] then
     return cachedAddresses[key]
