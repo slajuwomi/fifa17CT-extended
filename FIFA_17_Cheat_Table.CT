@@ -14,6 +14,14 @@ local helperPaths = {
   'lua/youth_helpers.lua',
 }
 
+if getTableFileName ~= nil then
+  local tableFileName = getTableFileName()
+  local tableDir = tableFileName and tableFileName:match('^(.*[\\/])')
+  if tableDir then
+    helperPaths[#helperPaths + 1] = tableDir .. 'lua/youth_helpers.lua'
+  end
+end
+
 if getCheatEngineDir ~= nil then
   helperPaths[#helperPaths + 1] = getCheatEngineDir() .. 'lua/youth_helpers.lua'
 end

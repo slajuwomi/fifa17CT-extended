@@ -1,5 +1,23 @@
 # AOB Discovery Log — FIFA 17 Youth Academy Port
 
+## Session 2: Shared Scaffolding
+
+### Scope
+
+Implemented issue `08-youth-academy-shared-scaffolding.md`.
+
+### Results
+
+- Backed up `FIFA_17_Cheat_Table.CT` to `FIFA_17_Cheat_Table.CT.bak` before editing.
+- Added an empty `Youth Academy` group after the existing `Scouts Management` group.
+- Replaced `lua/youth_helpers.lua` with helper functions and an empty AOB registry.
+- Wired helper loading through `ActivateItFirst` using external `lua/youth_helpers.lua` path lookup.
+- Confirmed the CT remains well-formed XML with Python `xml.etree.ElementTree`.
+
+### Notes
+
+No gameplay feature AOBs were added in this pass. The previous helper file contained candidate and pending FIFA 19-derived patterns, but this scaffolding slice requires no unconfirmed FIFA 17 AOBs in the registry.
+
 ## Session 1: Initial Static Scan
 
 ### Methodology
