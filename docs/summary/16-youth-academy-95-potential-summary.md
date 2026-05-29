@@ -24,8 +24,9 @@ Attempted `docs/issues/16-youth-academy-95-potential.md`, which targets only the
 
 - The confirmed AOB resolved uniquely in `FIFA17.exe`.
 - `auto_assemble_check(script)` passed for the enable section.
+- HITL validation confirmed the script enabled without error and generated scout report players had high potentials consistent with the feature.
 - Standalone disable-section checking reported a Cheat Engine access violation at `dealloc(newmem_YA_PlayerPotential)` because the allocation does not exist during isolated disable validation.
-- Real in-game behavior validation remains pending.
+- Live disable/re-enable validation remains pending.
 
 ## What Worked Well
 

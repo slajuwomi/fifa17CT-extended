@@ -17,7 +17,7 @@ Implement only the Youth Academy `95 Potential` feature so newly generated youth
 - [x] `lua/youth_helpers.lua` contains only the new confirmed AOB key needed for this feature.
 - [x] The hybrid Lua+AA script passes `auto_assemble_check(script)`.
 - [x] The CT contains the `95 Potential` entry under `Youth Academy`.
-- [ ] Enabling the script generates youth players with 95 potential in a real FIFA 17 Career Mode session with other youth generation modifiers disabled.
+- [x] Enabling the script generates youth players with 95 potential in a real FIFA 17 Career Mode session with other youth generation modifiers disabled.
 - [ ] Disabling and re-enabling the script restores clean behavior without requiring a CT reload.
 
 ## Blocked by
@@ -33,5 +33,6 @@ Runtime discovery found the FIFA 17 potential range initialization path after a 
 - The code reference at `0x148579C6B` builds each `PLAYER_ATTRIBUTES/TIER_%d_POTENTIAL_RANGE_%d` key, looks up the value, then writes it in a two-value loop.
 - The confirmed FIFA 17 AOB is `FF C3 48 83 C6 04 89 46 FC 83 FB 02 7C C2 44 89 F3` at `0x148579C97`.
 - The hook forces `eax = 95` before `mov [rsi-04],eax`, overriding each loaded potential range value.
+- HITL validation confirmed the script enabled without error and newly generated scout report players had high potentials consistent with the feature.
 
-Next decision needed: validate in a real FIFA 17 Career Mode session that enabling `95 Potential` before generating a fresh scout report produces youth players with 95 potential, then disable and re-enable the script without reloading the CT.
+Next decision needed: disable and re-enable the script without reloading the CT, then confirm it still enables cleanly and affects a fresh scout report.

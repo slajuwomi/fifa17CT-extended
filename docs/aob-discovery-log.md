@@ -17,6 +17,7 @@ Implemented issue `16-youth-academy-95-potential.md` up to the required real Car
 - Added `95 Potential` under the `Youth Academy` CT group.
 - `auto_assemble_check(script)` passed for the enable section.
 - Standalone disable-section checking returned a Cheat Engine access violation at `dealloc(newmem_YA_PlayerPotential)` because the allocation does not exist during isolated disable validation; live disable/re-enable remains a HITL validation item.
+- HITL validation confirmed the script enabled without error and generated scout report players had high potentials consistent with the feature.
 
 ### Original Code Context
 
@@ -41,7 +42,7 @@ Implemented issue `16-youth-academy-95-potential.md` up to the required real Car
 
 ### Validation Notes
 
-The hook replaces `inc ebx; add rsi,04; mov [rsi-04],eax` with the same instructions plus `mov eax,#95` before the write. This forces both potential range values for each tier to 95 as FIFA 17 initializes the loaded player-attribute settings. Real Career Mode validation is still pending: enable `95 Potential` before generating a fresh scout report, confirm generated youth players have 95 potential with other youth generation modifiers disabled, then disable and re-enable without reloading the CT.
+The hook replaces `inc ebx; add rsi,04; mov [rsi-04],eax` with the same instructions plus `mov eax,#95` before the write. This forces both potential range values for each tier to 95 as FIFA 17 initializes the loaded player-attribute settings. Enable and in-game potential validation passed. Live disable/re-enable without reloading the CT remains pending.
 
 ## Session 3: Minimum Promotion Age
 
