@@ -15,6 +15,7 @@ Implemented issue `13-youth-academy-min-promotion-age.md` up to the required rea
 - Added `MIN_PLAYER_AGE_FOR_PROMOTION = 12` under the `Youth Academy` CT group.
 - `auto_assemble_check(script)` passed for the enable section.
 - Confirmed `FIFA_17_Cheat_Table.CT` remains well-formed XML.
+- HITL validation passed in a real FIFA 17 Career Mode session: the script allowed promotion below the normal promotion age, and disable/re-enable worked without a CT reload.
 
 ### Original Code Context
 
@@ -35,7 +36,7 @@ Implemented issue `13-youth-academy-min-promotion-age.md` up to the required rea
 
 ### Validation Notes
 
-The hook preserves the first two original lookup instructions, compares the current lookup string against `YOUTH_SQUAD/MIN_PLAYER_AGE_FOR_PROMOTION`, and writes `12` to the resolved setting value at `[value+08]`. Disable restores the original 8 bytes at the injection point. Real in-game validation is still required with a FIFA 17 Career Mode save containing a youth academy player below the normal promotion age.
+The hook preserves the first two original lookup instructions, compares the current lookup string against `YOUTH_SQUAD/MIN_PLAYER_AGE_FOR_PROMOTION`, and writes `12` to the resolved setting value at `[value+08]`. Disable restores the original 8 bytes at the injection point. In-game validation passed with a FIFA 17 Career Mode save containing a youth academy player below the normal promotion age.
 
 ## Session 2: Shared Scaffolding
 

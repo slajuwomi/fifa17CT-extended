@@ -17,13 +17,9 @@ Implement only the Youth Academy `MIN_PLAYER_AGE_FOR_PROMOTION = 12` feature so 
 - [x] `lua/youth_helpers.lua` contains only the new confirmed AOB key needed for this feature.
 - [x] The hybrid Lua+AA script passes `auto_assemble_check(script)`.
 - [x] The CT contains the `MIN_PLAYER_AGE_FOR_PROMOTION = 12` entry under `Youth Academy`.
-- [ ] Enabling the script allows promotion of a player below the normal promotion age in a real FIFA 17 Career Mode session.
-- [ ] Disabling and re-enabling the script restores clean behavior without requiring a CT reload.
+- [x] Enabling the script allows promotion of a player below the normal promotion age in a real FIFA 17 Career Mode session.
+- [x] Disabling and re-enabling the script restores clean behavior without requiring a CT reload.
 
 ## Prerequisite
 
 - 08 — Youth Academy shared scaffolding: complete
-
-## Blocker
-
-Implementation and static/runtime discovery are complete, but the final two acceptance criteria require a real FIFA 17 Career Mode save with a youth academy player below the normal promotion age. Validate by enabling `ActivateItFirst`, enabling `Youth Academy > MIN_PLAYER_AGE_FOR_PROMOTION = 12` before loading the save, promoting a below-age academy player, disabling the script, then re-enabling it without reloading the CT.
