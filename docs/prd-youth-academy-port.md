@@ -225,63 +225,17 @@ original bytes → inject. On disable: restore original bytes → dealloc.
 
 ## Execution Phases
 
-### Phase 0 — Project Scaffolding (Estimated: 1 session)
+Development should move in thin vertical slices. After shared scaffolding is in place,
+each phase should attempt exactly one youth academy feature: discover its FIFA 17
+injection point, write only that script, integrate only that CT entry, and validate only
+that feature before moving on.
 
-1. Create `lua/youth_helpers.lua` with the AOB registry + validation function
-2. Back up `FIFA_17_Cheat_Table.CT` to `FIFA_17_Cheat_Table.CT.bak`
-3. Add a minimal Lua execution test to confirm Cheat Engine can load the helper from
-   the external file path
-4. Verify the CT still loads and functions correctly (no regressions)
+### Phase 0 — Shared Scaffolding (Estimated: 1 session)
 
-### Phase 1 — AOB Discovery via MCP Bridge (Estimated: 2–3 sessions)
-
-For each of the 13 features:
-
-1. Launch FIFA 17 with a career mode save loaded
-2. Attach MCP Bridge: `open_process("FIFA17.exe")`
-3. Try the FIFA 19 AOB pattern: `aob_scan_module(pattern, "FIFA17.exe")`
-4. If match found (unique):
-   - `disassemble(address, count=10)` to verify context
-   - Document the FIFA 17 injection address + surrounding code
-5. If no match / multiple matches:
-   - Search for related strings: `search_string("SCOUT_REPORT", "releasetoomanyplayers", etc.)`
-   - Use `find_references` on known data structures to find equivalent code paths
-   - Set data breakpoints on known youth-related memory to trigger on scout report generation
-   - Disassemble around hits to find the equivalent injection point
-6. Update `youth_helpers.lua` with confirmed FIFA 17 AOBs
-
-**Discovery Documentation Template (per feature):**
-
-```markdown
-## Feature: [Name]
-- FIFA 19 AOB: `xx xx xx ...`
-- FIFA 17 AOB: `xx xx xx ...` (or N/A if reengineered)
-- Injection address: FIFA17.exe+XXXXXXXX
-- Original code context: [5-10 lines]
-- Matches expected logic? Yes/No
-- Notes: [any quirks]
-```
-
-### Phase 2 — Script Construction (Estimated: 2–3 sessions)
-
-For each confirmed injection point:
-
-1. Write the hybrid Lua+AA script following the pattern above
-2. Validate syntax: `auto_assemble_check(script)`
-3. Test injection live: `auto_assemble(script)`
-4. Verify in-game effect (e.g., load career save, check youth scout report)
-5. Test disable + re-enable for clean state
-6. For scripts with child entries (configurable values):
-   - Add `alloc`/`registersymbol` for the value storage
-   - Add the memory record in the CT XML
-
-### Phase 3 — CT File Integration (Estimated: 1 session)
-
-1. Open `FIFA_17_Cheat_Table.CT` in the editor
-2. Insert the "Youth Academy" GroupHeader XML after the Scouts Management group
-3. Nest each script entry under the group
-4. Add child memory record entries for configurable values
-5. Add Lua loading initialization — embed in `ActivateItFirst` or as a separate init entry:
+1. Back up `FIFA_17_Cheat_Table.CT` to `FIFA_17_Cheat_Table.CT.bak`
+2. Create the empty "Youth Academy" GroupHeader after the Scouts Management group
+3. Create `lua/youth_helpers.lua` with helper functions but no unconfirmed FIFA 17 AOBs
+4. Add Lua helper loading initialization — embed in `ActivateItFirst` or as a separate init entry:
    ```lua
    {$lua}
    -- Load youth helpers
@@ -293,21 +247,130 @@ For each confirmed injection point:
    end
    {$asm}
    ```
+5. Add a minimal Lua execution test to confirm Cheat Engine can load the helper from
+   the external file path
 6. Verify the CT file is well-formed XML
-7. Load in Cheat Engine and confirm all entries appear
+7. Load the CT in Cheat Engine and verify existing features still appear and activate
 
-### Phase 4 — Validation (Estimated: 1 session)
+### Standard Feature Slice Checklist
+
+Use this checklist for every feature phase below. Do not batch multiple features into
+one implementation pass.
+
+1. Launch FIFA 17 with a career mode save loaded
+2. Attach MCP Bridge: `open_process("FIFA17.exe")`
+3. Try the feature's FIFA 19 AOB pattern: `aob_scan_module(pattern, "FIFA17.exe")`
+4. If match found and unique, disassemble around it with `disassemble(address, count=10)`
+5. If no match or multiple matches, search only for this feature's equivalent code path:
+   - Search related strings or nearby known constants
+   - Use references to relevant data structures where available
+   - Set a targeted data breakpoint if the feature can be triggered in-game
+6. Document the confirmed FIFA 17 AOB, injection address, original code, and notes
+7. Add only this feature's AOB key to `lua/youth_helpers.lua`
+8. Write only this feature's hybrid Lua+AA script
+9. Validate syntax with `auto_assemble_check(script)`
+10. Test enable, in-game behavior, disable, and re-enable
+11. Add only this feature's CT XML entry and child memory records, if needed
+12. Reload the CT and confirm the new entry appears under "Youth Academy"
+13. Update the discovery log before starting the next feature
+
+**Discovery Documentation Template (per feature):**
+
+```markdown
+## Feature: [Name]
+- FIFA 19 AOB: `xx xx xx ...`
+- FIFA 17 AOB: `xx xx xx ...` (or N/A if reengineered)
+- Injection address: FIFA17.exe+XXXXXXXX
+- Original code context: [5-10 lines]
+- Matches expected logic? Yes/No
+- In-game validation: Pass/Fail/Blocked
+- Notes: [any quirks]
+```
+
+### Phase 1 — SCOUT_REPORT_PLAYERS Slice (Estimated: 1 session)
+
+Deliver only `SCOUT_REPORT_PLAYERS` and its `intScoutReportPlayers` child entry.
+This is the first feature slice because it has a visible scout-report outcome and a
+simple configurable value, making it a good proof of the helper + CT integration path.
+
+### Phase 2 — Reveal OVR & POT Slice (Estimated: 1 session)
+
+Deliver only `Reveal OVR & POT`. Validate that generated youth players show true OVR
+and Potential without scouting uncertainty.
+
+### Phase 3 — PRIMARY_ATTRIBUTES_RANGE Slice (Estimated: 1 session)
+
+Deliver only `PRIMARY_ATTRIBUTES_RANGE` and its `primattr_rangelow` /
+`primattr_rangehigh` child entries. Validate the configurable values affect generated
+primary attribute ranges.
+
+### Phase 4 — SECONDARY_ATTRIBUTES_RANGE Slice (Estimated: 1 session)
+
+Deliver only `SECONDARY_ATTRIBUTES_RANGE` and its `secmattr_rangelow` /
+`secmattr_rangehigh` child entries. Validate independently from the primary attribute
+range feature.
+
+### Phase 5 — MIN_PLAYER_AGE_FOR_PROMOTION Slice (Estimated: 1 session)
+
+Deliver only `MIN_PLAYER_AGE_FOR_PROMOTION = 12`. Validate that a player below the
+normal promotion age can be promoted while the script is active.
+
+### Phase 6 — YOUTH_PLAYER_AGE_RANGE Slice (Estimated: 1 session)
+
+Deliver only `YOUTH_PLAYER_AGE_RANGE = [12, 16]`. Validate new scout reports produce
+players in the configured age range.
+
+### Phase 7 — Youth Player Retire at Age 30 Slice (Estimated: 1 session)
+
+Deliver only `Youth Player Retire at Age = 30`. Validate the generated retirement or
+academy-leaving age behavior without changing age range or promotion scripts.
+
+### Phase 8 — 95 Potential Slice (Estimated: 1 session)
+
+Deliver only `95 Potential`. Validate generated youth players receive 95 potential
+with all other youth generation modifiers disabled.
+
+### Phase 9 — 5-Star Weak Foot Slice (Estimated: 1 session)
+
+Deliver only `100% Chance for 5★ Weak Foot`. Validate generated youth players receive
+5-star weak foot.
+
+### Phase 10 — Scout Any Country Slice (Estimated: 1 session)
+
+Deliver only `Send Scout to Any Country` and its `ptr_YA_NatID` child entry. Validate
+both disabled behavior (`0`) and a specific nationality override.
+
+### Phase 11 — 5-Star Skill Moves Slice (Estimated: 1 session)
+
+Deliver only `100% Chance for 5★ Skill Moves`. Validate generated youth players
+receive 5-star skill moves.
+
+### Phase 12 — Same-Country Multi-Scout Slice (Estimated: 1 session)
+
+Deliver only `Set Up Multiple Scouting Networks in Same Country`. Validate the
+"Country Is Being Scouted" popup no longer blocks duplicate country assignments.
+
+### Phase 13 — Disable Player Regens Discovery Slice (Estimated: 1 session)
+
+Investigate only `Disable Player Regens`. This feature has unknown FIFA 17 behavior, so
+the phase may end with a documented implementation plan instead of a CT entry if the
+equivalent code path is not confidently identified.
+
+Exit criteria:
+- Confirm the FIFA 17 equivalent and proceed with the standard feature slice checklist, or
+- Mark the feature blocked with evidence and leave it out of the CT until a safer
+  approach is found
+
+### Phase 14 — Cross-Feature Validation Pass (Estimated: 1 session)
+
+Run this only after all individually validated slices are complete.
 
 1. Load the modified CT in Cheat Engine
-2. Enable `ActivateItFirst` — verify no errors
-3. Enable each youth script individually:
-   - Load career save with script active
-   - Send youth scout on mission
-   - Simulate to scout report generation
-   - Verify the feature's effect
-4. Test `[DISABLE]` — reload save, confirm game behaves normally
-5. Test combinations of scripts active simultaneously
-6. Document any issues or unexpected behavior
+2. Enable `ActivateItFirst` and verify no errors
+3. Enable each youth script individually once more
+4. Test common combinations of scripts active simultaneously
+5. Test `[DISABLE]` behavior after combination testing
+6. Document any conflicts or unexpected behavior
 
 ---
 

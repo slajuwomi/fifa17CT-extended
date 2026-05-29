@@ -1,6 +1,8 @@
 -- Youth Academy AOB Signature Registry for FIFA 17
 -- Maps feature keys to byte patterns found in FIFA17.exe
--- Patterns are initially from FIFA 19; will be updated with FIFA 17 equivalents during Phase 1
+-- Status: Phase 1 discovery in progress
+-- Patterns marked PENDING need runtime verification
+-- Patterns marked VERIFIED have been confirmed in FIFA 17
 
 local aobs = {
     AOB_MoreYouthPlayers       = '89 06 FF C7 48 83 C6 04 83 FF 02',
@@ -16,6 +18,22 @@ local aobs = {
     AOB_SkillMoveChance        = '89 B5 7C 01 00 00 4C',
     AOB_CountryIsBeingScouted  = '80 FB 01 75 0C 4C',
     AOB_NoPlayerRegens         = '41 BF 10 00 00 00 48 8B CE',
+}
+
+local aob_status = {
+    AOB_MoreYouthPlayers       = 'CANDIDATE: 2 matches found in FIFA 17 — need runtime verification to select correct one',
+    AOB_RevealPotAndOvr        = 'PENDING: No exact match; 3 partial matches for shortened pattern',
+    AOB_PrimAttr               = 'PENDING: No exact match; single 64-bit variant found (wrong op size)',
+    AOB_SecAttr                = 'PENDING: No exact match; single match in garbage data section',
+    AOB_MinAgeForPromotion     = 'PENDING: No match found; needs runtime analysis',
+    AOB_PlayerAgeRange         = 'PENDING: No match found; needs runtime analysis',
+    AOB_YouthPlayersRetirement = 'PENDING: No match found; needs runtime analysis',
+    AOB_PlayerPotential        = 'PENDING: No match found; needs runtime analysis',
+    AOB_WeakFootChance         = 'PENDING: No match found; needs runtime analysis',
+    AOB_AllCountriesAvailable  = 'PENDING: No match found; needs runtime analysis',
+    AOB_SkillMoveChance        = 'CANDIDATE: 2 shortened matches for mov [rbp+17C],esi',
+    AOB_CountryIsBeingScouted  = 'PENDING: No exact match; 35 partial matches for cmp bl,01; jne',
+    AOB_NoPlayerRegens         = 'PENDING: No match found; needs runtime analysis',
 }
 
 local _cached = {}
